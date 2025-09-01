@@ -3,7 +3,10 @@ package car
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/models"
 )
 
@@ -76,14 +79,125 @@ func (s Store) GetCarByBrand(ctx context.Context, brand string, isEngine bool) (
 	return cars, nil
 }
 
-func (S Store) CreateCar(ctx context.Context, carReq *models.CarRequest) (models.Car, error) {
+func (s Store) CreateCar(ctx context.Context, carReq *models.CarRequest) (models.Car, error) {
+	var createdCar models.Car
+	var engineID uuid.UUID
+	err := s.db.QueryRowContext(ctx, "SELECT id FROM engine WHERE id=$1", carReq.Engine.EngineID).Scan(&engineID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return createdCar, errors.New("engine not found")
+		}
+		return createdCar, err
+	}
 
+	carID := uuid.New()
+
+	createdAt := time.Now()
+	updatedAt := time.Now()
+
+	newCar := models.Car{
+		ID:       carID,
+		Name:     carReq.Name,
+		Year:     carReq.Year,
+		Brand:    carReq.Brand,
+		FuelType: carReq.FuelType,
+		Engine: models.Engine{
+			EngineID:       engineID,
+			Displacement:   carReq.Engine.Displacement,
+			NoOfCyclinders: carReq.Engine.NoOfCyclinders,
+			CarRange:       carReq.Engine.CarRange,
+		},
+		Price:     carReq.Price,
+		CreatedAt: createdAt,
+		UpdatedAt: updatedAt,
+	}
+
+	// Begin the transaction
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return createdCar, err
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		err = tx.Commit()
+	}()
+
+	query := `INSERT INTO car (id, name, year, brand, fuel_type, engine_id, price, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id, name, year, brand, fuel_type, engine_id, price, created_at, updated_at`
+
+	err = tx.QueryRowContext(ctx, query, newCar.ID, newCar.Name, newCar.Year, newCar.Brand, newCar.FuelType, newCar.Engine.EngineID, newCar.Price, newCar.CreatedAt, newCar.UpdatedAt).Scan(&createdCar.ID, &createdCar.Name, &createdCar.Year, &createdCar.Brand, &createdCar.FuelType, &createdCar.Engine.EngineID, &createdCar.Price, &createdCar.CreatedAt, &createdCar.UpdatedAt)
+	if err != nil {
+		return createdCar, err
+	}
+
+	return createdCar, nil
 }
 
 func (s Store) UpdateCar(ctx context.Context, id string, carReq *models.CarRequest) (models.Car, error) {
+	var updateCar models.Car
 
+	// Begin the transaction
+
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return updateCar, err
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		err = tx.Commit()
+	}()
+
+	query := `UPDATE car SET name=$1, year=$2, brand=$3, fuel_type=$4, engine_id=$5, price=$6, updated_at=$7 WHERE id=$8 RETURNING id, name, year, brand, fuel_type, engine_id, price, created_at, updated_at`
+
+	err = tx.QueryRowContext(ctx, query, carReq.Name, carReq.Year, carReq.Brand, carReq.FuelType, carReq.Engine.EngineID, carReq.Price, time.Now(), id).Scan(&updateCar.ID, &updateCar.Name, &updateCar.Year, &updateCar.Brand, &updateCar.FuelType, &updateCar.Engine.EngineID, &updateCar.Price, &updateCar.CreatedAt, &updateCar.UpdatedAt)
+	if err != nil {
+		return updateCar, err
+	}
+
+	return updateCar, nil
 }
 
 func (s Store) DeleteCar(ctx context.Context, id string) (models.Car, error) {
+	var deletedCar models.Car
 
+	// Begin the transaction
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return deletedCar, err
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		err = tx.Commit()
+	}()
+
+	err = tx.QueryRowContext(ctx, `SELECT id, name, year, brand, fuel_type, engine_id, price, created_at, updated_at FROM car WHERE id=$1`, id).Scan(&deletedCar.ID, &deletedCar.Name, &deletedCar.Year, &deletedCar.Brand, &deletedCar.FuelType, &deletedCar.Engine.EngineID, &deletedCar.Price, &deletedCar.CreatedAt, &deletedCar.UpdatedAt)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return deletedCar, errors.New("car not found")
+		}
+		return models.Car{}, err
+	}
+
+	result, err := tx.ExecContext(ctx, `DELETE FROM car WHERE id=$1`, id)
+	if err != nil {
+		return models.Car{}, err
+	}
+	if rowsAffected, err := result.RowsAffected(); err != nil {
+		return models.Car{}, err
+	} else if rowsAffected == 0 {
+		return models.Car{}, errors.New("no rows affected")
+	}
+
+	return deletedCar, nil
 }
