@@ -125,6 +125,8 @@ func (h *CarHandler) CreateCar(w http.ResponseWriter, r *http.Request) {
 
 func (h *CarHandler) UpdateCar(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	params := mux.Vars(r)
+	id := params["id"]
 
 	body, err := io.ReadAll(r.Body)
 
@@ -143,7 +145,7 @@ func (h *CarHandler) UpdateCar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updatedCar, err := h.service.UpdateCar(ctx, carReq)
+	updatedCar, err := h.service.UpdateCar(ctx, id, &carReq)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
