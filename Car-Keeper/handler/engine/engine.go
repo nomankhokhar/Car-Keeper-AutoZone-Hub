@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/models"
 	"github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/service"
@@ -153,19 +154,34 @@ func (e *EngineHandler) DeleteEngine(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error deleting engine: ", err)
 		w.WriteHeader(http.StatusInternalServerError)
+		response := map[string]string{"error": "Failed to delete engine or invalid ID"}
+		responseBody, _ := json.Marshal(response)
+		_, _ = w.Write(responseBody)
+		return
+	}
+
+	if deletedEngine.EngineID == uuid.Nil {
+		w.WriteHeader(http.StatusNotFound)
+		response := map[string]string{"error": "Engine not found"}
+		responseBody, _ := json.Marshal(response)
+		_, _ = w.Write(responseBody)
+		return
+	}
+
+	jsonResponse, err := json.Marshal(deletedEngine)
+	if err != nil {
+		log.Println("Error marshalling response body: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		response := map[string]string{"error": "Failed to process response"}
+		jsonResponse, _ := json.Marshal(response)
+		_, _ = w.Write(jsonResponse)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	responseBody, err := json.Marshal(deletedEngine)
-	if err != nil {
-		log.Println("Error marshalling response body: ", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	_, err = w.Write(responseBody)
+	_, err = w.Write(jsonResponse)
 	if err != nil {
 		log.Println("Error writing response: ", err)
 	}
