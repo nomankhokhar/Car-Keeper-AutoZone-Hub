@@ -2,6 +2,7 @@ package car
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -167,5 +168,33 @@ func (h *CarHandler) UpdateCar(w http.ResponseWriter, r *http.Request) {
 	_, err = w.Write(responseBody)
 	if err != nil {
 		log.Println("Error writing response : ", err)
+	}
+}
+
+func (h *CarHandler) DeleteCar(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	params := mux.Vars(r)
+	id := params["id"]
+
+	deletedCar, err := h.service.DeleteCar(ctx, id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("Error deleting car : ", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	responseBody, err := json.Marshal(deletedCar)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("Error marshalling response body : ", err)
+		return
+	}
+
+	_, err = w.Write(responseBody)
+	if err != nil {
+		fmt.Println("Error writing response : ", err)
 	}
 }
