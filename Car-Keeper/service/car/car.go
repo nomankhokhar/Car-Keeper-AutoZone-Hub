@@ -18,7 +18,7 @@ func NewCarService(store store.CarStoreInterface) *CarService {
 }
 
 func (cs *CarService) GetCarByID(ctx context.Context, id string) (*models.Car, error) {
-	car, err := cs.store.GetCarByID(ctx, id)
+	car, err := cs.store.GetCarById(ctx, id)
 	if err != nil {
 		return nil, err
 	}
