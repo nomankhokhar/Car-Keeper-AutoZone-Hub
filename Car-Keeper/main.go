@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -39,6 +40,12 @@ func main() {
 
 	router := mux.NewRouter()
 
+	schemaFile := "store/schema.sql"
+
+	if err := executeSchema(db, schemaFile); err != nil {
+		log.Fatalf("Failed to execute schema: %v", err)
+	}
+
 	router.HandleFunc("/cars/{id}", carHandler.GetCarByID).Methods("GET")
 	router.HandleFunc("/cars", carHandler.GetCarsByBrand).Methods("GET")
 	router.HandleFunc("/cars", carHandler.CreateCar).Methods("POST")
@@ -57,4 +64,18 @@ func main() {
 
 	http.ListenAndServe(":"+port, router)
 	fmt.Println("Starting server on :" + port)
+}
+
+func executeSchema(db *sql.DB, schemaFile string) error {
+	executeSchema, err := os.ReadFile(schemaFile)
+	if err != nil {
+		return fmt.Errorf("failed to read schema file: %w", err)
+	}
+
+	_, err = db.Exec(string(executeSchema))
+	if err != nil {
+		return fmt.Errorf("failed to execute schema: %w", err)
+	}
+
+	return nil
 }

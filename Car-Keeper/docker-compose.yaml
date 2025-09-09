@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=caruser
+      - DB_PASSWORD=carpassword
+      - DB_NAME=cardb
+    depends_on:
+      - db
+  db:
+    build: .
+    context: db
+    dockerfile: Dockerfile
+    environment:
+      - POSTGRES_USER=caruser
+      - POSTGRES_PASSWORD=carpassword
+      - POSTGRES_DB=card
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data: /var/lib/postgresql/data
+
+volumes:
+  postgres_data: {}
