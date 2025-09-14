@@ -10,21 +10,28 @@ services:
       - DB_PORT=5432
       - DB_USER=caruser
       - DB_PASSWORD=carpassword
-      - DB_NAME=cardb
+      - DB_NAME=car
     depends_on:
-      - db
+        db:
+          condition: service_healthy
+
   db:
-    build: .
-    context: db
-    dockerfile: Dockerfile
+    build:
+      context: ./db
+      dockerfile: Dockerfile
     environment:
       - POSTGRES_USER=caruser
       - POSTGRES_PASSWORD=carpassword
-      - POSTGRES_DB=card
+      - POSTGRES_DB=car
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data: /var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U caruser -d car"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
-  postgres_data: {}
+  postgres_data:

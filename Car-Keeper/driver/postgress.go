@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	_ "github.com/lib/pq"
 )
 
 var db *sql.DB
@@ -17,8 +19,8 @@ func InitDB() {
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASSWORD"),
 	)
-
-	db, err := sql.Open("postgres", connStr)
+	var err error
+	db, err = sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
