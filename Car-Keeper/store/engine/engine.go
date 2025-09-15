@@ -39,7 +39,7 @@ func (e EngineStore) GetEngineById(ctx context.Context, id string) (models.Engin
 		}
 	}()
 
-	err = tx.QueryRowContext(ctx, "SELECT id, displacement, noOfCylinders carRange FROM engine WHERE id = $1", id).Scan(&engine.EngineID, &engine.Displacement, &engine.NoOfCyclinders, &engine.CarRange)
+	err = tx.QueryRowContext(ctx, "SELECT id, displacement, noOfCyclinders, carRange FROM engine WHERE id = $1", id).Scan(&engine.EngineID, &engine.Displacement, &engine.NoOfCyclinders, &engine.CarRange)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -48,7 +48,7 @@ func (e EngineStore) GetEngineById(ctx context.Context, id string) (models.Engin
 		return engine, err
 	}
 
-	return engine, err
+	return engine, nil
 }
 
 func (e EngineStore) CreateEngine(ctx context.Context, engineReq *models.EngineRequest) (models.Engine, error) {
@@ -70,10 +70,18 @@ func (e EngineStore) CreateEngine(ctx context.Context, engineReq *models.EngineR
 
 	engineID := uuid.New()
 
-	_, err = tx.ExecContext(ctx, "INSERT INTO engine (id, displacement, noOfCylinders, carRange) VALUES ($1, $2, $3, $4)", engineID, engineReq.Displacement, engineReq.NoOfCyclinders, engineReq.CarRange)
+	res, err := tx.ExecContext(ctx, "INSERT INTO engine (id, displacement, noOfCyclinders, carRange) VALUES ($1, $2, $3, $4)", engineID, engineReq.Displacement, engineReq.NoOfCyclinders, engineReq.CarRange)
 
 	if err != nil {
 		return models.Engine{}, err
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return models.Engine{}, err
+	}
+	if rows == 0 {
+		return models.Engine{}, fmt.Errorf("no rows were inserted into engine table")
 	}
 
 	engine := models.Engine{

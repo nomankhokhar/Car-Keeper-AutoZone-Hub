@@ -41,29 +41,34 @@ func main() {
 	router := mux.NewRouter()
 
 	schemaFile := "store/schema.sql"
-
 	if err := executeSchema(db, schemaFile); err != nil {
 		log.Fatalf("Failed to execute schema: %v", err)
 	}
 
+	// Car routes
 	router.HandleFunc("/cars/{id}", carHandler.GetCarByID).Methods("GET")
 	router.HandleFunc("/cars", carHandler.GetCarsByBrand).Methods("GET")
 	router.HandleFunc("/cars", carHandler.CreateCar).Methods("POST")
 	router.HandleFunc("/cars/{id}", carHandler.UpdateCar).Methods("PUT")
 	router.HandleFunc("/cars/{id}", carHandler.DeleteCar).Methods("DELETE")
 
+	// Engine routes
 	router.HandleFunc("/engines/{id}", engineHandler.GetEngineByID).Methods("GET")
 	router.HandleFunc("/engines", engineHandler.CreateEngine).Methods("POST")
 	router.HandleFunc("/engines/{id}", engineHandler.UpdateEngine).Methods("PUT")
 	router.HandleFunc("/engines/{id}", engineHandler.DeleteEngine).Methods("DELETE")
 
+	// Start server
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	http.ListenAndServe(":"+port, router)
 	fmt.Println("Starting server on :" + port)
+	if err := http.ListenAndServe(":"+port, router); err != nil {
+		log.Fatalf("Server failed: %v", err)
+	}
+
 }
 
 func executeSchema(db *sql.DB, schemaFile string) error {
