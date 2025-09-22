@@ -23,11 +23,33 @@ func New(db *sql.DB) *Store {
 func (s Store) GetCarById(ctx context.Context, id string) (models.Car, error) {
 	var Car models.Car
 
-	query := `SELECT c.id, c.name, c.year, c.brand, c.fuel_type, c.engine_id, c.price, c.created_at, c.updated_at, e.id, e.displacement, e.noOfCyclinders, e.carRange FROM car c LEFT JOIN engine e ON c.engine_id = e.id WHERE c.id=$1`
+	query := `
+		SELECT c.id, c.name, c.year, c.brand, c.fuel_type, c.engine_id,
+		       c.price, c.created_at, c.updated_at,
+		       e.displacement, e.noofcylinders, e.carrange
+		FROM car c
+		LEFT JOIN engine e ON c.engine_id = e.id
+		WHERE c.id=$1
+	`
 
 	row := s.db.QueryRowContext(ctx, query, id)
 
-	err := row.Scan(&Car.ID, &Car.Name, &Car.Year, &Car.Brand, &Car.FuelType, &Car.Engine.EngineID, &Car.Price, &Car.CreatedAt, &Car.UpdatedAt, &Car.Engine.EngineID, &Car.Engine.Displacement, &Car.Engine.NoOfCyclinders, &Car.Engine.CarRange)
+	// ⚠️ Removed duplicate scan for EngineID
+	err := row.Scan(
+		&Car.ID,
+		&Car.Name,
+		&Car.Year,
+		&Car.Brand,
+		&Car.FuelType,
+		&Car.Engine.EngineID,
+		&Car.Price,
+		&Car.CreatedAt,
+		&Car.UpdatedAt,
+		&Car.Engine.Displacement,
+		&Car.Engine.NoOfCyclinders,
+		&Car.Engine.CarRange,
+	)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return Car, nil
@@ -43,7 +65,7 @@ func (s Store) GetCarByBrand(ctx context.Context, brand string, isEngine bool) (
 
 	var query string
 	if isEngine {
-		query = `SELECT c.id, c.name, c.year, c.brand, c.fuel_type, c.engine_id, c.price, c.created_at, c.updated_at, e.id, e.displacement, e.noOfCyclinders, e.carRange FROM car c LEFT JOIN engine e ON c.engine_id = e.id WHERE c.brand=$1`
+		query = `SELECT c.id, c.name, c.year, c.brand, c.fuel_type, c.engine_id, c.price, c.created_at, c.updated_at, e.id, e.displacement, e.noofcylinders, e.carrange FROM car c LEFT JOIN engine e ON c.engine_id = e.id WHERE c.brand=$1`
 	} else {
 		query = `SELECT id, name, year, brand, fuel_type, engine_id, price, created_at, updated_at FROM car WHERE brand=$1`
 	}

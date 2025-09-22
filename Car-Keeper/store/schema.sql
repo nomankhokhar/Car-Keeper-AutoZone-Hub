@@ -6,8 +6,8 @@ DROP TABLE IF EXISTS engine CASCADE;
 CREATE TABLE engine (
     id UUID PRIMARY KEY,
     displacement INT NOT NULL,
-    noOfCyclinders INT NOT NULL,
-    carRange INT NOT NULL,
+    noofcylinders INT NOT NULL,
+    carrange INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -27,7 +27,7 @@ CREATE TABLE car (
 );
 
 -- Insert dummy data
-INSERT INTO engine (id, displacement, noOfCyclinders, carRange)
+INSERT INTO engine (id, displacement, noofcylinders, carrange)
 VALUES
     ('e1f86b1a-0873-4c19-bae2-fc60329d0140'::uuid, 2000, 4, 600),
     ('f4a9c66b-8e38-419b-93c4-215d5cefb318'::uuid, 1600, 4, 550),

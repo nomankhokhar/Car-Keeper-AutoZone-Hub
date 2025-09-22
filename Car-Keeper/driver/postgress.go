@@ -19,6 +19,7 @@ func InitDB() {
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASSWORD"),
 	)
+	fmt.Println(os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"))
 	var err error
 	db, err = sql.Open("postgres", connStr)
 	if err != nil {

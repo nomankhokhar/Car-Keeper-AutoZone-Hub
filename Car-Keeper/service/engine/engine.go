@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/models"
 	"github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/store"
@@ -26,6 +27,7 @@ func (s *EngineService) GetEngineByID(ctx context.Context, id string) (*models.E
 }
 
 func (s *EngineService) CreateEngine(ctx context.Context, engineReq *models.EngineRequest) (*models.Engine, error) {
+	fmt.Println("Validating Engine Request:", engineReq)
 	if err := models.ValidateEngineRequest(*engineReq); err != nil {
 		return nil, err
 	}

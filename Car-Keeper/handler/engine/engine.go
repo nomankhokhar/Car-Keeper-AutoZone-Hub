@@ -2,6 +2,7 @@ package engine
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -34,6 +35,7 @@ func (e *EngineHandler) GetEngineByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("Fetched Engine: ", resp)
 	respBody, err := json.Marshal(resp)
 	if err != nil {
 		log.Println("Error: ", err)
@@ -76,7 +78,7 @@ func (e *EngineHandler) CreateEngine(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error creating engine: ", err)
 		return
 	}
-
+	fmt.Println("Created Engine: ", createdEngine)
 	responseBody, err := json.Marshal(createdEngine)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -100,38 +102,29 @@ func (e *EngineHandler) UpdateEngine(w http.ResponseWriter, r *http.Request) {
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Println("Error reading request body: ", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	body, err = json.Marshal(body)
-
-	if err != nil {
-		log.Println("Error marshalling request body: ", err)
+		log.Println("Error reading request body:", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	var engineReq models.EngineRequest
 	err = json.Unmarshal(body, &engineReq)
-
 	if err != nil {
-		log.Println("Error unmarshalling request body: ", err)
-		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("Error unmarshalling request body:", err)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	updatedEngine, err := e.service.UpdateEngine(ctx, id, &engineReq)
 	if err != nil {
-		log.Println("Error updating engine: ", err)
+		log.Println("Error updating engine:", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	responseBody, err := json.Marshal(updatedEngine)
 	if err != nil {
-		log.Println("Error marshalling response body: ", err)
+		log.Println("Error marshalling response body:", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -139,9 +132,8 @@ func (e *EngineHandler) UpdateEngine(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	_, err = w.Write(responseBody)
-	if err != nil {
-		log.Println("Error writing response: ", err)
+	if _, err := w.Write(responseBody); err != nil {
+		log.Println("Error writing response:", err)
 	}
 }
 

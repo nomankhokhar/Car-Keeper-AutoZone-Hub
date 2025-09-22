@@ -9,14 +9,14 @@ import (
 type Engine struct {
 	EngineID       uuid.UUID `json:"engine_id"`
 	Displacement   int64     `json:"displacement"`
-	NoOfCyclinders int64     `json:"noOfCyclinders"`
-	CarRange       int64     `json:"carRange"`
+	NoOfCyclinders int64     `json:"noofcylinders"`
+	CarRange       int64     `json:"carrange"`
 }
 
 type EngineRequest struct {
 	Displacement   int64 `json:"displacement"`
-	NoOfCyclinders int64 `json:"noOfCyclinders"`
-	CarRange       int64 `json:"carRange"`
+	NoOfCyclinders int64 `json:"noofcylinders"`
+	CarRange       int64 `json:"carrange"`
 }
 
 func ValidateEngineRequest(engineReq EngineRequest) error {
