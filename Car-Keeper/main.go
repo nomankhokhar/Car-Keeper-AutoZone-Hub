@@ -12,7 +12,8 @@ import (
 	"github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/driver"
 	carHandler "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/handler/car"
 	engineHandler "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/handler/engine"
-	"github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/middleware"
+	LoginHandler "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/handler/login"
+	middleware "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/middleware"
 	carService "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/service/car"
 	engineService "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/service/engine"
 	carStore "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/store/car"
@@ -41,26 +42,28 @@ func main() {
 
 	router := mux.NewRouter()
 
-	// Middleware
-	router.Use(middleware.AuthMiddleware)
-
 	schemaFile := "store/schema.sql"
 	if err := executeSchema(db, schemaFile); err != nil {
 		log.Fatalf("Failed to execute schema: %v", err)
 	}
 
+	router.HandleFunc("/login", LoginHandler.LoginHandler).Methods("POST")
+
+	// Middleware
+	protected := router.PathPrefix("/").Subrouter()
+	protected.Use(middleware.AuthMiddleware)
 	// Car routes
-	router.HandleFunc("/cars/{id}", carHandler.GetCarByID).Methods("GET")
-	router.HandleFunc("/cars", carHandler.GetCarsByBrand).Methods("GET")
-	router.HandleFunc("/cars", carHandler.CreateCar).Methods("POST")
-	router.HandleFunc("/cars/{id}", carHandler.UpdateCar).Methods("PUT")
-	router.HandleFunc("/cars/{id}", carHandler.DeleteCar).Methods("DELETE")
+	protected.HandleFunc("/cars/{id}", carHandler.GetCarByID).Methods("GET")
+	protected.HandleFunc("/cars", carHandler.GetCarsByBrand).Methods("GET")
+	protected.HandleFunc("/cars", carHandler.CreateCar).Methods("POST")
+	protected.HandleFunc("/cars/{id}", carHandler.UpdateCar).Methods("PUT")
+	protected.HandleFunc("/cars/{id}", carHandler.DeleteCar).Methods("DELETE")
 
 	// Engine routes
-	router.HandleFunc("/engines/{id}", engineHandler.GetEngineByID).Methods("GET")
-	router.HandleFunc("/engines", engineHandler.CreateEngine).Methods("POST")
-	router.HandleFunc("/engines/{id}", engineHandler.UpdateEngine).Methods("PUT")
-	router.HandleFunc("/engines/{id}", engineHandler.DeleteEngine).Methods("DELETE")
+	protected.HandleFunc("/engines/{id}", engineHandler.GetEngineByID).Methods("GET")
+	protected.HandleFunc("/engines", engineHandler.CreateEngine).Methods("POST")
+	protected.HandleFunc("/engines/{id}", engineHandler.UpdateEngine).Methods("PUT")
+	protected.HandleFunc("/engines/{id}", engineHandler.DeleteEngine).Methods("DELETE")
 
 	// Start server
 	port := os.Getenv("PORT")
