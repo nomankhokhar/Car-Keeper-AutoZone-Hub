@@ -12,6 +12,7 @@ import (
 	"github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/driver"
 	carHandler "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/handler/car"
 	engineHandler "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/handler/engine"
+	"github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/middleware"
 	carService "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/service/car"
 	engineService "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/service/engine"
 	carStore "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/store/car"
@@ -39,6 +40,9 @@ func main() {
 	engineHandler := engineHandler.NewEngineHandler(engineService)
 
 	router := mux.NewRouter()
+
+	// Middleware
+	router.Use(middleware.AuthMiddleware)
 
 	schemaFile := "store/schema.sql"
 	if err := executeSchema(db, schemaFile); err != nil {
