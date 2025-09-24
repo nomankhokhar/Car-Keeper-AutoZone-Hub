@@ -20,6 +20,7 @@ import (
 	engineService "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/service/engine"
 	carStore "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/store/car"
 	engineStore "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/store/engine"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
@@ -64,6 +65,7 @@ func main() {
 
 	router := mux.NewRouter()
 	router.Use(otelmux.Middleware("Car-Keeper"))
+	router.Use(middleware.MetricsMiddleware)
 
 	schemaFile := "store/schema.sql"
 	if err := executeSchema(db, schemaFile); err != nil {
@@ -87,6 +89,9 @@ func main() {
 	protected.HandleFunc("/engines", engineHandler.CreateEngine).Methods("POST")
 	protected.HandleFunc("/engines/{id}", engineHandler.UpdateEngine).Methods("PUT")
 	protected.HandleFunc("/engines/{id}", engineHandler.DeleteEngine).Methods("DELETE")
+
+	// Prometheus metrics endpoint
+	router.Handle("/metrics", promhttp.Handler())
 
 	// Start server
 	port := os.Getenv("PORT")

@@ -21,3 +21,9 @@ go run main.go
 
 # To Access the Jaeger UI
 Open your web browser and navigate to http://localhost:16686
+
+# To Access the Prometheus UI
+Open your web browser and navigate to http://localhost:9090
+
+# To Access the Grafana UI
+Open your web browser and navigate to http://localhost:3000 (default username and password are both "admin")
