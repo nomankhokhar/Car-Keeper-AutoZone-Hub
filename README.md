@@ -18,3 +18,6 @@ export DB_PASSWORD=carpassword
 
 # To Run the Application Locally
 go run main.go
+
+# To Access the Jaeger UI
+Open your web browser and navigate to http://localhost:16686
