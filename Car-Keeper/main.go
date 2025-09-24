@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -18,6 +20,11 @@ import (
 	engineService "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/service/engine"
 	carStore "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/store/car"
 	engineStore "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/store/engine"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"go.opentelemetry.io/otel/sdk/resource"
+	"go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 )
 
 func main() {
@@ -26,6 +33,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
+
+	tracerProvider, err := startTracing()
+	if err != nil {
+		log.Fatalf("Failed to start tracing: %v", err)
+	}
+
+	defer func() {
+		if err := tracerProvider.Shutdown(context.Background()); err != nil {
+			log.Fatalf("Failed to shutdown tracer provider: %v", err)
+		}
+	}()
 
 	driver.InitDB()
 	defer driver.CloseDB()
@@ -90,4 +108,39 @@ func executeSchema(db *sql.DB, schemaFile string) error {
 	}
 
 	return nil
+}
+
+func startTracing() (*trace.TracerProvider, error) {
+	header := map[string]string{
+		"Content-Type": "application/json",
+	}
+
+	exporter, err := otlptrace.New(
+		context.Background(),
+		otlptracehttp.NewClient(
+			otlptracehttp.WithEndpoint("jaeger:4318"),
+			otlptracehttp.WithHeaders(header),
+			otlptracehttp.WithInsecure(),
+		))
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to create exporter: %w", err)
+	}
+
+	tracerProvider := trace.NewTracerProvider(
+		trace.WithBatcher(
+			exporter,
+			trace.WithMaxExportBatchSize(trace.DefaultMaxExportBatchSize),
+			trace.WithBatchTimeout(trace.DefaultScheduleDelay*time.Millisecond),
+		),
+		trace.WithResource(
+			resource.NewWithAttributes(
+				semconv.SchemaURL,
+				semconv.ServiceName("Car-Keeper"),
+				semconv.ServiceVersion("1.0.0"),
+			),
+		),
+	)
+
+	return tracerProvider, nil
 }
