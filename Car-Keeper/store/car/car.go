@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/models"
+	"go.opentelemetry.io/otel"
 )
 
 type Store struct {
@@ -21,6 +22,10 @@ func New(db *sql.DB) *Store {
 }
 
 func (s Store) GetCarById(ctx context.Context, id string) (models.Car, error) {
+	tracer := otel.Tracer("CarStore")
+	ctx, span := tracer.Start(ctx, "GetCarById-Store")
+	defer span.End()
+
 	var Car models.Car
 
 	query := `
@@ -61,6 +66,10 @@ func (s Store) GetCarById(ctx context.Context, id string) (models.Car, error) {
 }
 
 func (s Store) GetCarByBrand(ctx context.Context, brand string, isEngine bool) ([]models.Car, error) {
+	tracer := otel.Tracer("CarStore")
+	ctx, span := tracer.Start(ctx, "GetCarByBrand-Store")
+	defer span.End()
+
 	var cars []models.Car
 
 	var query string
@@ -102,6 +111,10 @@ func (s Store) GetCarByBrand(ctx context.Context, brand string, isEngine bool) (
 }
 
 func (s Store) CreateCar(ctx context.Context, carReq *models.CarRequest) (models.Car, error) {
+	tracer := otel.Tracer("CarStore")
+	ctx, span := tracer.Start(ctx, "CreateCar-Store")
+	defer span.End()
+
 	var createdCar models.Car
 	var engineID uuid.UUID
 	err := s.db.QueryRowContext(ctx, "SELECT id FROM engine WHERE id=$1", carReq.Engine.EngineID).Scan(&engineID)
@@ -159,6 +172,10 @@ func (s Store) CreateCar(ctx context.Context, carReq *models.CarRequest) (models
 }
 
 func (s Store) UpdateCar(ctx context.Context, id string, carReq *models.CarRequest) (models.Car, error) {
+	tracer := otel.Tracer("CarStore")
+	ctx, span := tracer.Start(ctx, "UpdateCar-Store")
+	defer span.End()
+
 	var updateCar models.Car
 
 	// Begin the transaction
@@ -187,6 +204,10 @@ func (s Store) UpdateCar(ctx context.Context, id string, carReq *models.CarReque
 }
 
 func (s Store) DeleteCar(ctx context.Context, id string) (models.Car, error) {
+	tracer := otel.Tracer("CarStore")
+	ctx, span := tracer.Start(ctx, "DeleteCar-Store")
+	defer span.End()
+
 	var deletedCar models.Car
 
 	// Begin the transaction

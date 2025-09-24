@@ -20,6 +20,8 @@ import (
 	engineService "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/service/engine"
 	carStore "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/store/car"
 	engineStore "github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/store/engine"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -45,6 +47,8 @@ func main() {
 		}
 	}()
 
+	otel.SetTracerProvider(tracerProvider)
+
 	driver.InitDB()
 	defer driver.CloseDB()
 
@@ -59,6 +63,7 @@ func main() {
 	engineHandler := engineHandler.NewEngineHandler(engineService)
 
 	router := mux.NewRouter()
+	router.Use(otelmux.Middleware("Car-Keeper"))
 
 	schemaFile := "store/schema.sql"
 	if err := executeSchema(db, schemaFile); err != nil {
@@ -136,8 +141,7 @@ func startTracing() (*trace.TracerProvider, error) {
 		trace.WithResource(
 			resource.NewWithAttributes(
 				semconv.SchemaURL,
-				semconv.ServiceName("Car-Keeper"),
-				semconv.ServiceVersion("1.0.0"),
+				semconv.ServiceNameKey.String("Car-Keeper"),
 			),
 		),
 	)

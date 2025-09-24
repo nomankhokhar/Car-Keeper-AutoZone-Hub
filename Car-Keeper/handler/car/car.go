@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/models"
 	"github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/service"
+	"go.opentelemetry.io/otel"
 )
 
 type CarHandler struct {
@@ -21,7 +22,9 @@ func NewCarHandler(service service.CarServiceInterface) *CarHandler {
 }
 
 func (h *CarHandler) GetCarByID(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	tracer := otel.Tracer("CarHandler")
+	ctx, span := tracer.Start(r.Context(), "GetCarByID-Handler")
+	defer span.End()
 
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -51,7 +54,10 @@ func (h *CarHandler) GetCarByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CarHandler) GetCarsByBrand(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	tracer := otel.Tracer("CarHandler")
+	ctx, span := tracer.Start(r.Context(), "GetCarsByBrand-Handler")
+	defer span.End()
+
 	brand := r.URL.Query().Get("brand")
 	isEngine := r.URL.Query().Get("isEngine") == "true"
 
@@ -80,7 +86,9 @@ func (h *CarHandler) GetCarsByBrand(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CarHandler) CreateCar(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	tracer := otel.Tracer("CarHandler")
+	ctx, span := tracer.Start(r.Context(), "CreateCar-Handler")
+	defer span.End()
 
 	reqBody, err := io.ReadAll(r.Body)
 
@@ -125,7 +133,10 @@ func (h *CarHandler) CreateCar(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CarHandler) UpdateCar(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	tracer := otel.Tracer("CarHandler")
+	ctx, span := tracer.Start(r.Context(), "UpdateCar-Handler")
+	defer span.End()
+
 	params := mux.Vars(r)
 	id := params["id"]
 
@@ -172,7 +183,10 @@ func (h *CarHandler) UpdateCar(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CarHandler) DeleteCar(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	tracer := otel.Tracer("CarHandler")
+	ctx, span := tracer.Start(r.Context(), "DeleteCar-Handler")
+	defer span.End()
+
 	params := mux.Vars(r)
 	id := params["id"]
 

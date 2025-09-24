@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/nomankhokhar/Car-Keeper-AutoZone-Hub/models"
+	"go.opentelemetry.io/otel"
 )
 
 type EngineStore struct {
@@ -21,9 +22,11 @@ func New(db *sql.DB) *EngineStore {
 }
 
 func (e EngineStore) GetEngineById(ctx context.Context, id string) (models.Engine, error) {
-	var engine models.Engine
+	tracer := otel.Tracer("EngineStore")
+	ctx, span := tracer.Start(ctx, "GetEngineById-Store")
+	defer span.End()
 
-	fmt.Println("Starting GetEngineById with ID:", id)
+	var engine models.Engine
 
 	tx, err := e.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -65,7 +68,9 @@ func (e EngineStore) GetEngineById(ctx context.Context, id string) (models.Engin
 }
 
 func (e EngineStore) CreateEngine(ctx context.Context, engineReq *models.EngineRequest) (models.Engine, error) {
-	fmt.Println("Starting CreateEngine with request:", engineReq)
+	tracer := otel.Tracer("EngineStore")
+	ctx, span := tracer.Start(ctx, "CreateEngine-Store")
+	defer span.End()
 
 	tx, err := e.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -123,6 +128,10 @@ func (e EngineStore) CreateEngine(ctx context.Context, engineReq *models.EngineR
 }
 
 func (e EngineStore) UpdateEngine(ctx context.Context, id string, engineReq *models.EngineRequest) (models.Engine, error) {
+	tracer := otel.Tracer("EngineStore")
+	ctx, span := tracer.Start(ctx, "UpdateEngine-Store")
+	defer span.End()
+
 	engineID, err := uuid.Parse(id)
 
 	if err != nil {
@@ -167,6 +176,10 @@ func (e EngineStore) UpdateEngine(ctx context.Context, id string, engineReq *mod
 }
 
 func (e EngineStore) DeleteEngine(ctx context.Context, id string) (models.Engine, error) {
+	tracer := otel.Tracer("EngineStore")
+	ctx, span := tracer.Start(ctx, "DeleteEngine-Store")
+	defer span.End()
+
 	engineID, err := uuid.Parse(id)
 
 	if err != nil {
