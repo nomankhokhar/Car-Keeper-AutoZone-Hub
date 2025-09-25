@@ -17,6 +17,7 @@ services:
       - db
       - jaeger
       - prometheus
+    restart: unless-stopped
 
   db:
     build:
