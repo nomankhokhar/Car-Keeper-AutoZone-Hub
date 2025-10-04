@@ -52,6 +52,10 @@ func main() {
 		cars := v1.Group("/cars")
 		{
 			cars.GET("/:carid", carHandler.GetCarByID)
+			cars.GET("/", carHandler.GetCarByBrand)
+			cars.POST("/", carHandler.CreateCar)
+			cars.PUT("/:carid", carHandler.UpdateCar)
+			cars.DELETE("/:carid", carHandler.DeleteCar)
 		}
 	}
 

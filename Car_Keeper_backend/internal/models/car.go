@@ -33,10 +33,10 @@ func (c *Car) BeforeCreate(tx *gorm.DB) error {
 }
 
 type CarRequest struct {
-	Name     string    `json:"name"`
-	Year     string    `json:"year"`
-	Brand    string    `json:"brand"`
-	FuelType string    `json:"fuel_type"`
-	EngineID uuid.UUID `json:"engine_id"` // use ID, not full object
-	Price    float64   `json:"price"`
+	Name     string    `json:"name" binding:"required"`
+	Year     string    `json:"year" binding:"required,len=4"`
+	Brand    string    `json:"brand" binding:"required"`
+	FuelType string    `json:"fuel_type" binding:"required,oneof=petrol diesel electric hybrid"`
+	EngineID uuid.UUID `json:"engine_id" binding:"required"` // use ID, not full object
+	Price    float64   `json:"price" binding:"required"`
 }

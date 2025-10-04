@@ -33,7 +33,7 @@ func (Engine) TableName() string {
 }
 
 type EngineRequest struct {
-	Displacement  int64 `json:"displacement"`
-	NoOfCylinders int64 `json:"no_of_cylinders"`
-	CarRange      int64 `json:"car_range"`
+	Displacement  int64 `json:"displacement" binding:"required"`
+	NoOfCylinders int64 `json:"no_of_cylinders" binding:"required"`
+	CarRange      int64 `json:"car_range" binding:"required"`
 }

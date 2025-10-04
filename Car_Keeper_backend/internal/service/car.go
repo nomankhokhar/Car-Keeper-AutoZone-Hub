@@ -7,6 +7,10 @@ import (
 
 type CarService interface {
 	GetCarByID(id string) (*models.Car, error)
+	GetCarByBrand(brand string) ([]models.Car, error)
+	CreateCar(car *models.CarRequest) error
+	UpdateCar(id string, car *models.CarRequest) error
+	DeleteCar(id string) error
 }
 
 type carService struct {
@@ -19,4 +23,23 @@ func NewCarService(repo repository.CarRepository) CarService {
 
 func (s *carService) GetCarByID(id string) (*models.Car, error) {
 	return s.repo.GetCarByID(id)
+}
+func (s *carService) GetCarByBrand(brand string) ([]models.Car, error) {
+	return s.repo.GetCarByBrand(brand)
+}
+
+func (s *carService) CreateCar(carReq *models.CarRequest) error {
+	return s.repo.CreateCar(carReq)
+}
+
+func (s *carService) UpdateCar(id string, carReq *models.CarRequest) error {
+	// For simplicity, we'll just call CreateCar for now.
+	// In a real application, you'd implement an UpdateCar method in the repository.
+	return s.repo.UpdateCar(id, carReq)
+}
+
+func (s *carService) DeleteCar(id string) error {
+	// For simplicity, we'll just call CreateCar for now.
+	// In a real application, you'd implement a DeleteCar method in the repository.
+	return s.repo.DeleteCar(id)
 }
