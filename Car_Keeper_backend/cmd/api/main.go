@@ -26,12 +26,15 @@ func main() {
 	log.Println("Database initialized successfully")
 	// Initialize repositories
 	carRepo := repository.NewCarRepository(db)
+	engineRepo := repository.NewEngineRepository(db)
 
 	// Initialize services
 	carService := service.NewCarService(carRepo)
+	engineService := service.NewEngineService(engineRepo)
 
 	// Initialize handlers
 	carHandler := handler.NewCarHandler(carService)
+	engineHandler := handler.NewEngineHandler(engineService)
 
 	// Setup Gin router
 	router := gin.Default()
@@ -56,6 +59,11 @@ func main() {
 			cars.POST("/", carHandler.CreateCar)
 			cars.PUT("/:carid", carHandler.UpdateCar)
 			cars.DELETE("/:carid", carHandler.DeleteCar)
+		}
+		engine := v1.Group("/engines")
+		{
+			engine.GET("/:engineid", engineHandler.GetEngineByID)
+			engine.POST("/", engineHandler.CreateEngine)
 		}
 	}
 
