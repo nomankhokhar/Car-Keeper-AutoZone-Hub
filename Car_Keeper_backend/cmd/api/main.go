@@ -17,25 +17,21 @@ func main() {
 	// Load configuration
 	cfg := config.Load()
 
-	// Initialize database
-	db, err := database.NewPostgresDB(cfg)
+	// Initialize database (with auto-migration and optional schema)
+	db, err := database.InitDatabase(cfg)
 	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+		log.Fatal("Failed to initialize database:", err)
 	}
 
-	// Auto migrate models
-	if err := database.AutoMigrate(db); err != nil {
-		log.Fatal("Failed to migrate database:", err)
-	}
-
+	log.Println("Database initialized successfully")
 	// Initialize repositories
-	userRepo := repository.NewUserRepository(db)
+	carRepo := repository.NewCarRepository(db)
 
 	// Initialize services
-	userService := service.NewUserService(userRepo)
+	carService := service.NewCarService(carRepo)
 
 	// Initialize handlers
-	userHandler := handler.NewUserHandler(userService)
+	carHandler := handler.NewCarHandler(carService)
 
 	// Setup Gin router
 	router := gin.Default()
@@ -52,14 +48,10 @@ func main() {
 	// API routes
 	v1 := router.Group("/api/v1")
 	{
-		// User routes
-		users := v1.Group("/users")
+		// Car routes
+		cars := v1.Group("/cars")
 		{
-			users.POST("/register", userHandler.Register)
-			users.POST("/login", userHandler.Login)
-			users.GET("/:id", middleware.AuthMiddleware(), userHandler.GetByID)
-			users.PUT("/:id", middleware.AuthMiddleware(), userHandler.Update)
-			users.DELETE("/:id", middleware.AuthMiddleware(), userHandler.Delete)
+			cars.GET("/:carid", carHandler.GetCarByID)
 		}
 	}
 

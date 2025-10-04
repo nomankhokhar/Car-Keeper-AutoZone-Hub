@@ -26,9 +26,9 @@ func Load() *Config {
 	return &Config{
 		DBHost:     getEnv("DB_HOST", "localhost"),
 		DBPort:     getEnv("DB_PORT", "5432"),
-		DBUser:     getEnv("DB_USER", "postgres"),
-		DBPassword: getEnv("DB_PASSWORD", "postgres"),
-		DBName:     getEnv("DB_NAME", "car_keeper"),
+		DBUser:     getEnv("DB_USER", "caruser"),
+		DBPassword: getEnv("DB_PASSWORD", "carpassword"),
+		DBName:     getEnv("DB_NAME", "car"),
 		JWTSecret:  getEnv("JWT_SECRET", "BetterCallSoul"),
 		Port:       getEnv("PORT", "8080"),
 	}
