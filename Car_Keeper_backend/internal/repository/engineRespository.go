@@ -13,6 +13,8 @@ type engineRepository struct {
 type EngineRepository interface {
 	GetEngineByID(id string) (*models.Engine, error)
 	CreateEngine(engine *models.Engine) error
+	UpdateEngine(engine *models.Engine) error
+	DeleteEngine(engineID string) error
 }
 
 func NewEngineRepository(db *gorm.DB) EngineRepository {
@@ -29,4 +31,12 @@ func (r *engineRepository) GetEngineByID(id string) (*models.Engine, error) {
 
 func (r *engineRepository) CreateEngine(engine *models.Engine) error {
 	return r.db.Create(engine).Error
+}
+
+func (r *engineRepository) UpdateEngine(engine *models.Engine) error {
+	return r.db.Save(engine).Error
+}
+
+func (r *engineRepository) DeleteEngine(engineID string) error {
+	return r.db.Delete(&models.Engine{}, "engine_id = ?", engineID).Error
 }

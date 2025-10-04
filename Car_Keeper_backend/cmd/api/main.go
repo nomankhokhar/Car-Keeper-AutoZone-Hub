@@ -64,6 +64,8 @@ func main() {
 		{
 			engine.GET("/:engineid", engineHandler.GetEngineByID)
 			engine.POST("/", engineHandler.CreateEngine)
+			engine.PUT("/:engineid", engineHandler.UpdateEngine)
+			engine.DELETE("/:engineid", engineHandler.DeleteEngine)
 		}
 	}
 
