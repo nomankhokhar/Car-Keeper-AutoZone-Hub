@@ -19,11 +19,11 @@ func NewCarHandler(service service.CarService) *CarHandler {
 // Get by Car ID
 func (h *CarHandler) GetCarByID(c *gin.Context) {
 	tracer := otel.Tracer("CarHandler")
-	_, span := tracer.Start(c.Request.Context(), "GetCarByID-Handler")
+	ctx, span := tracer.Start(c.Request.Context(), "GetCarByID-Handler")
 	defer span.End()
 
 	carID := c.Param("carid")
-	car, err := h.service.GetCarByID(carID)
+	car, err := h.service.GetCarByID(ctx, carID)
 	if err != nil {
 		c.JSON(404, gin.H{"message": "Car not found", "error": err.Error()})
 		return
@@ -33,11 +33,11 @@ func (h *CarHandler) GetCarByID(c *gin.Context) {
 
 func (h *CarHandler) GetCarByBrand(c *gin.Context) {
 	tracer := otel.Tracer("CarHandler")
-	_, span := tracer.Start(c.Request.Context(), "GetCarByBrand-Handler")
+	ctx, span := tracer.Start(c.Request.Context(), "GetCarByBrand-Handler")
 	defer span.End()
 
 	brand := c.Query("brand")
-	cars, err := h.service.GetCarByBrand(brand)
+	cars, err := h.service.GetCarByBrand(ctx, brand)
 	if err != nil {
 		c.JSON(404, gin.H{"message": "Cars not found", "error": err.Error()})
 		return
@@ -47,7 +47,7 @@ func (h *CarHandler) GetCarByBrand(c *gin.Context) {
 
 func (h *CarHandler) CreateCar(c *gin.Context) {
 	tracer := otel.Tracer("CarHandler")
-	_, span := tracer.Start(c.Request.Context(), "CreateCar-Handler")
+	ctx, span := tracer.Start(c.Request.Context(), "CreateCar-Handler")
 	defer span.End()
 
 	var carReq models.CarRequest
@@ -57,7 +57,7 @@ func (h *CarHandler) CreateCar(c *gin.Context) {
 		return
 	}
 	// Call service to create car
-	if err := h.service.CreateCar(&carReq); err != nil {
+	if err := h.service.CreateCar(ctx, &carReq); err != nil {
 		c.JSON(500, gin.H{"message": "Failed to create car", "error": err.Error()})
 		return
 	}
@@ -66,7 +66,7 @@ func (h *CarHandler) CreateCar(c *gin.Context) {
 
 func (h *CarHandler) UpdateCar(c *gin.Context) {
 	tracer := otel.Tracer("CarHandler")
-	_, span := tracer.Start(c.Request.Context(), "UpdateCar-Handler")
+	ctx, span := tracer.Start(c.Request.Context(), "UpdateCar-Handler")
 	defer span.End()
 
 	carId := c.Param("carid")
@@ -77,7 +77,7 @@ func (h *CarHandler) UpdateCar(c *gin.Context) {
 		return
 	}
 	// Call service to update car
-	if err := h.service.UpdateCar(carId, &carReq); err != nil {
+	if err := h.service.UpdateCar(ctx, carId, &carReq); err != nil {
 		c.JSON(500, gin.H{"message": "Failed to update car", "error": err.Error()})
 		return
 	}
@@ -86,11 +86,11 @@ func (h *CarHandler) UpdateCar(c *gin.Context) {
 
 func (h *CarHandler) DeleteCar(c *gin.Context) {
 	tracer := otel.Tracer("CarHandler")
-	_, span := tracer.Start(c.Request.Context(), "DeleteCar-Handler")
+	ctx, span := tracer.Start(c.Request.Context(), "DeleteCar-Handler")
 	defer span.End()
 
 	carID := c.Param("carid")
-	if err := h.service.DeleteCar(carID); err != nil {
+	if err := h.service.DeleteCar(ctx, carID); err != nil {
 		c.JSON(500, gin.H{"message": "Failed to delete car", "error": err.Error()})
 		return
 	}

@@ -13,19 +13,19 @@ type engineRepository struct {
 }
 
 type EngineRepository interface {
-	GetEngineByID(id string) (*models.Engine, error)
-	CreateEngine(engine *models.Engine) error
-	UpdateEngine(engine *models.Engine) error
-	DeleteEngine(engineID string) error
+	GetEngineByID(ctx context.Context, id string) (*models.Engine, error)
+	CreateEngine(ctx context.Context, engine *models.Engine) error
+	UpdateEngine(ctx context.Context, engine *models.Engine) error
+	DeleteEngine(ctx context.Context, engineID string) error
 }
 
 func NewEngineRepository(db *gorm.DB) EngineRepository {
 	return &engineRepository{db: db}
 }
 
-func (r *engineRepository) GetEngineByID(id string) (*models.Engine, error) {
+func (r *engineRepository) GetEngineByID(ctx context.Context, id string) (*models.Engine, error) {
 	tracer := otel.Tracer("EngineRepository")
-	_, span := tracer.Start(context.Background(), "GetEngineByID-Repository")
+	ctx, span := tracer.Start(ctx, "GetEngineByID-Repository")
 	defer span.End()
 
 	var engine models.Engine
@@ -35,25 +35,25 @@ func (r *engineRepository) GetEngineByID(id string) (*models.Engine, error) {
 	return &engine, nil
 }
 
-func (r *engineRepository) CreateEngine(engine *models.Engine) error {
+func (r *engineRepository) CreateEngine(ctx context.Context, engine *models.Engine) error {
 	tracer := otel.Tracer("EngineRepository")
-	_, span := tracer.Start(context.Background(), "CreateEngine-Repository")
+	ctx, span := tracer.Start(ctx, "CreateEngine-Repository")
 	defer span.End()
 
 	return r.db.Create(engine).Error
 }
 
-func (r *engineRepository) UpdateEngine(engine *models.Engine) error {
+func (r *engineRepository) UpdateEngine(ctx context.Context, engine *models.Engine) error {
 	tracer := otel.Tracer("EngineRepository")
-	_, span := tracer.Start(context.Background(), "UpdateEngine-Repository")
+	ctx, span := tracer.Start(ctx, "UpdateEngine-Repository")
 	defer span.End()
 
 	return r.db.Save(engine).Error
 }
 
-func (r *engineRepository) DeleteEngine(engineID string) error {
+func (r *engineRepository) DeleteEngine(ctx context.Context, engineID string) error {
 	tracer := otel.Tracer("EngineRepository")
-	_, span := tracer.Start(context.Background(), "DeleteEngine-Repository")
+	ctx, span := tracer.Start(ctx, "DeleteEngine-Repository")
 	defer span.End()
 
 	return r.db.Delete(&models.Engine{}, "engine_id = ?", engineID).Error

@@ -18,7 +18,7 @@ func NewEngineHandler(service service.EngineService) *EngineHandler {
 
 func (h *EngineHandler) GetEngineByID(c *gin.Context) {
 	trace := otel.Tracer("EngineHandler")
-	_, span := trace.Start(c.Request.Context(), "GetEngineByID-Handler")
+	ctx, span := trace.Start(c.Request.Context(), "GetEngineByID-Handler")
 	defer span.End()
 
 	engineID := c.Param("engineid")
@@ -28,7 +28,7 @@ func (h *EngineHandler) GetEngineByID(c *gin.Context) {
 	}
 
 	// Call service to get engine by ID
-	engine, err := h.service.GetEngineByID(engineID)
+	engine, err := h.service.GetEngineByID(ctx, engineID)
 	if err != nil {
 		c.JSON(404, gin.H{"message": "Engine not found", "error": err.Error()})
 		return
@@ -38,7 +38,7 @@ func (h *EngineHandler) GetEngineByID(c *gin.Context) {
 
 func (h *EngineHandler) CreateEngine(c *gin.Context) {
 	trace := otel.Tracer("EngineHandler")
-	_, span := trace.Start(c.Request.Context(), "CreateEngine-Handler")
+	ctx, span := trace.Start(c.Request.Context(), "CreateEngine-Handler")
 	defer span.End()
 
 	var engineReq models.EngineRequest
@@ -48,7 +48,7 @@ func (h *EngineHandler) CreateEngine(c *gin.Context) {
 	}
 
 	// Call service to create engine
-	engine, err := h.service.CreateEngine(&engineReq)
+	engine, err := h.service.CreateEngine(ctx, &engineReq)
 	if err != nil {
 		c.JSON(500, gin.H{"message": "Failed to create engine", "error": err.Error()})
 		return
@@ -58,7 +58,7 @@ func (h *EngineHandler) CreateEngine(c *gin.Context) {
 
 func (h *EngineHandler) UpdateEngine(c *gin.Context) {
 	trace := otel.Tracer("EngineHandler")
-	_, span := trace.Start(c.Request.Context(), "UpdateEngine-Handler")
+	ctx, span := trace.Start(c.Request.Context(), "UpdateEngine-Handler")
 	defer span.End()
 
 	engineID := c.Param("engineid")
@@ -74,7 +74,7 @@ func (h *EngineHandler) UpdateEngine(c *gin.Context) {
 	}
 
 	// Call service to update engine
-	engine, err := h.service.UpdateEngine(engineID, &engineReq)
+	engine, err := h.service.UpdateEngine(ctx, engineID, &engineReq)
 	if err != nil {
 		c.JSON(500, gin.H{"message": "Failed to update engine", "error": err.Error()})
 		return
@@ -84,7 +84,7 @@ func (h *EngineHandler) UpdateEngine(c *gin.Context) {
 
 func (h *EngineHandler) DeleteEngine(c *gin.Context) {
 	trace := otel.Tracer("EngineHandler")
-	_, span := trace.Start(c.Request.Context(), "DeleteEngine-Handler")
+	ctx, span := trace.Start(c.Request.Context(), "DeleteEngine-Handler")
 	defer span.End()
 
 	engineID := c.Param("engineid")
@@ -94,7 +94,7 @@ func (h *EngineHandler) DeleteEngine(c *gin.Context) {
 	}
 
 	// Call service to delete engine
-	if err := h.service.DeleteEngine(engineID); err != nil {
+	if err := h.service.DeleteEngine(ctx, engineID); err != nil {
 		c.JSON(500, gin.H{"message": "Failed to delete engine", "error": err.Error()})
 		return
 	}

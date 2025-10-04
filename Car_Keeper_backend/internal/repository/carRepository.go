@@ -19,16 +19,16 @@ func NewCarRepository(db *gorm.DB) CarRepository {
 }
 
 type CarRepository interface {
-	GetCarByID(id string) (*models.Car, error)
-	GetCarByBrand(brand string) ([]models.Car, error)
-	CreateCar(carReq *models.CarRequest) error
-	UpdateCar(id string, carReq *models.CarRequest) error
-	DeleteCar(id string) error
+	GetCarByID(ctx context.Context, id string) (*models.Car, error)
+	GetCarByBrand(ctx context.Context, brand string) ([]models.Car, error)
+	CreateCar(ctx context.Context, carReq *models.CarRequest) error
+	UpdateCar(ctx context.Context, id string, carReq *models.CarRequest) error
+	DeleteCar(ctx context.Context, id string) error
 }
 
-func (r *carRepository) GetCarByID(id string) (*models.Car, error) {
+func (r *carRepository) GetCarByID(ctx context.Context, id string) (*models.Car, error) {
 	tracer := otel.Tracer("CarRepository")
-	_, span := tracer.Start(context.Background(), "GetCarByID-Repository")
+	ctx, span := tracer.Start(ctx, "GetCarByID-Repository")
 	defer span.End()
 
 	// Parse string to real UUID type
@@ -44,9 +44,9 @@ func (r *carRepository) GetCarByID(id string) (*models.Car, error) {
 	return &car, nil
 }
 
-func (r *carRepository) GetCarByBrand(brand string) ([]models.Car, error) {
+func (r *carRepository) GetCarByBrand(ctx context.Context, brand string) ([]models.Car, error) {
 	tracer := otel.Tracer("CarRepository")
-	_, span := tracer.Start(context.Background(), "GetCarByBrand-Repository")
+	ctx, span := tracer.Start(ctx, "GetCarByBrand-Repository")
 	defer span.End()
 
 	var cars []models.Car
@@ -56,9 +56,9 @@ func (r *carRepository) GetCarByBrand(brand string) ([]models.Car, error) {
 	return cars, nil
 }
 
-func (r *carRepository) CreateCar(carReq *models.CarRequest) error {
+func (r *carRepository) CreateCar(ctx context.Context, carReq *models.CarRequest) error {
 	tracer := otel.Tracer("CarRepository")
-	_, span := tracer.Start(context.Background(), "CreateCar-Repository")
+	ctx, span := tracer.Start(ctx, "CreateCar-Repository")
 	defer span.End()
 
 	// Map CarRequest to Car model
@@ -74,9 +74,9 @@ func (r *carRepository) CreateCar(carReq *models.CarRequest) error {
 	return r.db.Create(&car).Error
 }
 
-func (r *carRepository) UpdateCar(carID string, carReq *models.CarRequest) error {
+func (r *carRepository) UpdateCar(ctx context.Context, carID string, carReq *models.CarRequest) error {
 	tracer := otel.Tracer("CarRepository")
-	_, span := tracer.Start(context.Background(), "UpdateCar-Repository")
+	ctx, span := tracer.Start(ctx, "UpdateCar-Repository")
 	defer span.End()
 
 	// Map CarRequest to Car model
@@ -99,9 +99,9 @@ func (r *carRepository) UpdateCar(carID string, carReq *models.CarRequest) error
 	return r.db.Save(&car).Error
 }
 
-func (r *carRepository) DeleteCar(id string) error {
+func (r *carRepository) DeleteCar(ctx context.Context, id string) error {
 	tracer := otel.Tracer("CarRepository")
-	_, span := tracer.Start(context.Background(), "DeleteCar-Repository")
+	ctx, span := tracer.Start(ctx, "DeleteCar-Repository")
 	defer span.End()
 
 	// Parse string to real UUID type

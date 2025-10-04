@@ -9,10 +9,10 @@ import (
 )
 
 type EngineService interface {
-	GetEngineByID(id string) (*models.Engine, error)
-	CreateEngine(engineReq *models.EngineRequest) (*models.Engine, error)
-	UpdateEngine(id string, engineReq *models.EngineRequest) (*models.Engine, error)
-	DeleteEngine(id string) error
+	GetEngineByID(ctx context.Context, id string) (*models.Engine, error)
+	CreateEngine(ctx context.Context, engineReq *models.EngineRequest) (*models.Engine, error)
+	UpdateEngine(ctx context.Context, id string, engineReq *models.EngineRequest) (*models.Engine, error)
+	DeleteEngine(ctx context.Context, id string) error
 }
 
 type engineService struct {
@@ -22,17 +22,17 @@ type engineService struct {
 func NewEngineService(repo repository.EngineRepository) EngineService {
 	return &engineService{repo: repo}
 }
-func (s *engineService) GetEngineByID(id string) (*models.Engine, error) {
+func (s *engineService) GetEngineByID(ctx context.Context, id string) (*models.Engine, error) {
 	trace := otel.Tracer("EngineService")
-	_, span := trace.Start(context.Background(), "GetEngineByID-Service")
+	ctx, span := trace.Start(ctx, "GetEngineByID-Service")
 	defer span.End()
 
-	return s.repo.GetEngineByID(id)
+	return s.repo.GetEngineByID(ctx, id)
 }
 
-func (s *engineService) CreateEngine(engineReq *models.EngineRequest) (*models.Engine, error) {
+func (s *engineService) CreateEngine(ctx context.Context, engineReq *models.EngineRequest) (*models.Engine, error) {
 	trace := otel.Tracer("EngineService")
-	_, span := trace.Start(context.Background(), "CreateEngine-Service")
+	ctx, span := trace.Start(ctx, "CreateEngine-Service")
 	defer span.End()
 
 	engine := &models.Engine{
@@ -40,18 +40,18 @@ func (s *engineService) CreateEngine(engineReq *models.EngineRequest) (*models.E
 		NoOfCylinders: engineReq.NoOfCylinders,
 		CarRange:      engineReq.CarRange,
 	}
-	if err := s.repo.CreateEngine(engine); err != nil {
+	if err := s.repo.CreateEngine(ctx, engine); err != nil {
 		return nil, err
 	}
 	return engine, nil
 }
 
-func (s *engineService) UpdateEngine(id string, engineReq *models.EngineRequest) (*models.Engine, error) {
+func (s *engineService) UpdateEngine(ctx context.Context, id string, engineReq *models.EngineRequest) (*models.Engine, error) {
 	trace := otel.Tracer("EngineService")
-	_, span := trace.Start(context.Background(), "UpdateEngine-Service")
+	ctx, span := trace.Start(ctx, "UpdateEngine-Service")
 	defer span.End()
 
-	engine, err := s.repo.GetEngineByID(id)
+	engine, err := s.repo.GetEngineByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -60,16 +60,16 @@ func (s *engineService) UpdateEngine(id string, engineReq *models.EngineRequest)
 	engine.NoOfCylinders = engineReq.NoOfCylinders
 	engine.CarRange = engineReq.CarRange
 
-	if err := s.repo.UpdateEngine(engine); err != nil {
+	if err := s.repo.UpdateEngine(ctx, engine); err != nil {
 		return nil, err
 	}
 	return engine, nil
 }
 
-func (s *engineService) DeleteEngine(engineID string) error {
+func (s *engineService) DeleteEngine(ctx context.Context, engineID string) error {
 	trace := otel.Tracer("EngineService")
-	_, span := trace.Start(context.Background(), "DeleteEngine-Service")
+	ctx, span := trace.Start(ctx, "DeleteEngine-Service")
 	defer span.End()
 
-	return s.repo.DeleteEngine(engineID)
+	return s.repo.DeleteEngine(ctx, engineID)
 }
