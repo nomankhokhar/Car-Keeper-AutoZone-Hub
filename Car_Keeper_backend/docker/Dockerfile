@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine AS builder
+FROM golang:1.24.4-alpine AS builder
 
 WORKDIR /app
 
@@ -16,7 +16,6 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 
 COPY --from=builder /app/main .
-COPY --from=builder /app/.env.example .env
 
 EXPOSE 8080
 

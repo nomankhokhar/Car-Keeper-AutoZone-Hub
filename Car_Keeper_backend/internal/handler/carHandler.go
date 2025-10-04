@@ -5,6 +5,7 @@ import (
 	"Car_Keeper/internal/service"
 
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/otel"
 )
 
 type CarHandler struct {
@@ -17,6 +18,10 @@ func NewCarHandler(service service.CarService) *CarHandler {
 
 // Get by Car ID
 func (h *CarHandler) GetCarByID(c *gin.Context) {
+	tracer := otel.Tracer("CarHandler")
+	_, span := tracer.Start(c.Request.Context(), "GetCarByID-Handler")
+	defer span.End()
+
 	carID := c.Param("carid")
 	car, err := h.service.GetCarByID(carID)
 	if err != nil {
@@ -27,6 +32,10 @@ func (h *CarHandler) GetCarByID(c *gin.Context) {
 }
 
 func (h *CarHandler) GetCarByBrand(c *gin.Context) {
+	tracer := otel.Tracer("CarHandler")
+	_, span := tracer.Start(c.Request.Context(), "GetCarByBrand-Handler")
+	defer span.End()
+
 	brand := c.Query("brand")
 	cars, err := h.service.GetCarByBrand(brand)
 	if err != nil {
@@ -37,6 +46,10 @@ func (h *CarHandler) GetCarByBrand(c *gin.Context) {
 }
 
 func (h *CarHandler) CreateCar(c *gin.Context) {
+	tracer := otel.Tracer("CarHandler")
+	_, span := tracer.Start(c.Request.Context(), "CreateCar-Handler")
+	defer span.End()
+
 	var carReq models.CarRequest
 	// Bind JSON request to struct
 	if err := c.ShouldBindJSON(&carReq); err != nil {
@@ -52,6 +65,10 @@ func (h *CarHandler) CreateCar(c *gin.Context) {
 }
 
 func (h *CarHandler) UpdateCar(c *gin.Context) {
+	tracer := otel.Tracer("CarHandler")
+	_, span := tracer.Start(c.Request.Context(), "UpdateCar-Handler")
+	defer span.End()
+
 	carId := c.Param("carid")
 	var carReq models.CarRequest
 	// Bind JSON request to struct
@@ -68,6 +85,10 @@ func (h *CarHandler) UpdateCar(c *gin.Context) {
 }
 
 func (h *CarHandler) DeleteCar(c *gin.Context) {
+	tracer := otel.Tracer("CarHandler")
+	_, span := tracer.Start(c.Request.Context(), "DeleteCar-Handler")
+	defer span.End()
+
 	carID := c.Param("carid")
 	if err := h.service.DeleteCar(carID); err != nil {
 		c.JSON(500, gin.H{"message": "Failed to delete car", "error": err.Error()})

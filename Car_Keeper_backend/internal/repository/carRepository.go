@@ -2,9 +2,11 @@ package repository
 
 import (
 	"Car_Keeper/internal/models"
+	"context"
 	"fmt"
 
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel"
 	"gorm.io/gorm"
 )
 
@@ -25,6 +27,10 @@ type CarRepository interface {
 }
 
 func (r *carRepository) GetCarByID(id string) (*models.Car, error) {
+	tracer := otel.Tracer("CarRepository")
+	_, span := tracer.Start(context.Background(), "GetCarByID-Repository")
+	defer span.End()
+
 	// Parse string to real UUID type
 	carID, err := uuid.Parse(id)
 	if err != nil {
@@ -39,6 +45,10 @@ func (r *carRepository) GetCarByID(id string) (*models.Car, error) {
 }
 
 func (r *carRepository) GetCarByBrand(brand string) ([]models.Car, error) {
+	tracer := otel.Tracer("CarRepository")
+	_, span := tracer.Start(context.Background(), "GetCarByBrand-Repository")
+	defer span.End()
+
 	var cars []models.Car
 	if err := r.db.Preload("Engine").Where("brand = ?", brand).Find(&cars).Error; err != nil {
 		return nil, err
@@ -47,6 +57,10 @@ func (r *carRepository) GetCarByBrand(brand string) ([]models.Car, error) {
 }
 
 func (r *carRepository) CreateCar(carReq *models.CarRequest) error {
+	tracer := otel.Tracer("CarRepository")
+	_, span := tracer.Start(context.Background(), "CreateCar-Repository")
+	defer span.End()
+
 	// Map CarRequest to Car model
 	car := models.Car{
 		Name:     carReq.Name,
@@ -61,6 +75,10 @@ func (r *carRepository) CreateCar(carReq *models.CarRequest) error {
 }
 
 func (r *carRepository) UpdateCar(carID string, carReq *models.CarRequest) error {
+	tracer := otel.Tracer("CarRepository")
+	_, span := tracer.Start(context.Background(), "UpdateCar-Repository")
+	defer span.End()
+
 	// Map CarRequest to Car model
 	// Parse string to real UUID type
 	id, err := uuid.Parse(carID)
@@ -82,6 +100,10 @@ func (r *carRepository) UpdateCar(carID string, carReq *models.CarRequest) error
 }
 
 func (r *carRepository) DeleteCar(id string) error {
+	tracer := otel.Tracer("CarRepository")
+	_, span := tracer.Start(context.Background(), "DeleteCar-Repository")
+	defer span.End()
+
 	// Parse string to real UUID type
 	carID, err := uuid.Parse(id)
 	if err != nil {

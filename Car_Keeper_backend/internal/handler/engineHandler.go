@@ -5,6 +5,7 @@ import (
 	"Car_Keeper/internal/service"
 
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/otel"
 )
 
 type EngineHandler struct {
@@ -16,6 +17,9 @@ func NewEngineHandler(service service.EngineService) *EngineHandler {
 }
 
 func (h *EngineHandler) GetEngineByID(c *gin.Context) {
+	trace := otel.Tracer("EngineHandler")
+	_, span := trace.Start(c.Request.Context(), "GetEngineByID-Handler")
+	defer span.End()
 
 	engineID := c.Param("engineid")
 	if engineID == "" {
@@ -33,6 +37,10 @@ func (h *EngineHandler) GetEngineByID(c *gin.Context) {
 }
 
 func (h *EngineHandler) CreateEngine(c *gin.Context) {
+	trace := otel.Tracer("EngineHandler")
+	_, span := trace.Start(c.Request.Context(), "CreateEngine-Handler")
+	defer span.End()
+
 	var engineReq models.EngineRequest
 	if err := c.ShouldBindJSON(&engineReq); err != nil {
 		c.JSON(400, gin.H{"message": "Invalid request", "error": err.Error()})
@@ -49,6 +57,10 @@ func (h *EngineHandler) CreateEngine(c *gin.Context) {
 }
 
 func (h *EngineHandler) UpdateEngine(c *gin.Context) {
+	trace := otel.Tracer("EngineHandler")
+	_, span := trace.Start(c.Request.Context(), "UpdateEngine-Handler")
+	defer span.End()
+
 	engineID := c.Param("engineid")
 	if engineID == "" {
 		c.JSON(400, gin.H{"message": "Engine ID is required"})
@@ -71,6 +83,10 @@ func (h *EngineHandler) UpdateEngine(c *gin.Context) {
 }
 
 func (h *EngineHandler) DeleteEngine(c *gin.Context) {
+	trace := otel.Tracer("EngineHandler")
+	_, span := trace.Start(c.Request.Context(), "DeleteEngine-Handler")
+	defer span.End()
+
 	engineID := c.Param("engineid")
 	if engineID == "" {
 		c.JSON(400, gin.H{"message": "Engine ID is required"})

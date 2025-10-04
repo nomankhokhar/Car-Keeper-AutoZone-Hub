@@ -3,6 +3,9 @@ package service
 import (
 	"Car_Keeper/internal/models"
 	"Car_Keeper/internal/repository"
+	"context"
+
+	"go.opentelemetry.io/otel"
 )
 
 type EngineService interface {
@@ -20,10 +23,18 @@ func NewEngineService(repo repository.EngineRepository) EngineService {
 	return &engineService{repo: repo}
 }
 func (s *engineService) GetEngineByID(id string) (*models.Engine, error) {
+	trace := otel.Tracer("EngineService")
+	_, span := trace.Start(context.Background(), "GetEngineByID-Service")
+	defer span.End()
+
 	return s.repo.GetEngineByID(id)
 }
 
 func (s *engineService) CreateEngine(engineReq *models.EngineRequest) (*models.Engine, error) {
+	trace := otel.Tracer("EngineService")
+	_, span := trace.Start(context.Background(), "CreateEngine-Service")
+	defer span.End()
+
 	engine := &models.Engine{
 		Displacement:  engineReq.Displacement,
 		NoOfCylinders: engineReq.NoOfCylinders,
@@ -36,6 +47,10 @@ func (s *engineService) CreateEngine(engineReq *models.EngineRequest) (*models.E
 }
 
 func (s *engineService) UpdateEngine(id string, engineReq *models.EngineRequest) (*models.Engine, error) {
+	trace := otel.Tracer("EngineService")
+	_, span := trace.Start(context.Background(), "UpdateEngine-Service")
+	defer span.End()
+
 	engine, err := s.repo.GetEngineByID(id)
 	if err != nil {
 		return nil, err
@@ -52,5 +67,9 @@ func (s *engineService) UpdateEngine(id string, engineReq *models.EngineRequest)
 }
 
 func (s *engineService) DeleteEngine(engineID string) error {
+	trace := otel.Tracer("EngineService")
+	_, span := trace.Start(context.Background(), "DeleteEngine-Service")
+	defer span.End()
+
 	return s.repo.DeleteEngine(engineID)
 }
