@@ -16,6 +16,9 @@ export DB_NAME=car
 export DB_USER=caruser
 export DB_PASSWORD=carpassword
 
+# Added Data Source for Prometheus
+Use http://prometheus:9090 in Grafana when using Docker
+
 # To Run the Application Locally
 go run main.go
 
