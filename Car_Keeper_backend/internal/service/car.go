@@ -8,20 +8,20 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
-type CarService interface {
-	GetCarByID(ctx context.Context, id string) (*models.Car, error)
-	GetCarByBrand(ctx context.Context, brand string) ([]models.Car, error)
-	CreateCar(ctx context.Context, car *models.CarRequest) error
-	UpdateCar(ctx context.Context, id string, car *models.CarRequest) error
-	DeleteCar(ctx context.Context, id string) error
-}
-
 type carService struct {
 	repo repository.CarRepository
 }
 
 func NewCarService(repo repository.CarRepository) CarService {
 	return &carService{repo: repo}
+}
+
+type CarService interface {
+	GetCarByID(ctx context.Context, id string) (*models.Car, error)
+	GetCarByBrand(ctx context.Context, brand string) ([]models.Car, error)
+	CreateCar(ctx context.Context, car *models.CarRequest) error
+	UpdateCar(ctx context.Context, id string, car *models.CarRequest) error
+	DeleteCar(ctx context.Context, id string) error
 }
 
 func (s *carService) GetCarByID(ctx context.Context, id string) (*models.Car, error) {
@@ -31,6 +31,7 @@ func (s *carService) GetCarByID(ctx context.Context, id string) (*models.Car, er
 
 	return s.repo.GetCarByID(ctx, id)
 }
+
 func (s *carService) GetCarByBrand(ctx context.Context, brand string) ([]models.Car, error) {
 	tracer := otel.Tracer("CarService")
 	_, span := tracer.Start(ctx, "GetCarByBrand-Service")
