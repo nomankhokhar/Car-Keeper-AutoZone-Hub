@@ -28,7 +28,7 @@ spec:
         - containerPort: 5432
         volumeMounts:
         - name: postgres-data
-          mountPath: /var/lib/postgresql/data
+          mountPath: /var/lib/postgresql  # Mount at /var/lib/postgresql, not /var/lib/postgresql/data
         livenessProbe:
           exec:
             command:
@@ -41,15 +41,4 @@ spec:
           periodSeconds: 5
       volumes:
       - name: postgres-data
-        emptyDir: {}
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: car-keeper-db
-spec:
-  ports:
-  - port: 5432
-    targetPort: 5432
-  selector:
-    app: car-keeper-db
+        emptyDir: {}  # or specify your PersistentVolumeClaim if you're using a PVC

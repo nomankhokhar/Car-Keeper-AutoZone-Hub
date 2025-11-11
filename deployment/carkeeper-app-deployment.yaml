@@ -12,6 +12,10 @@ spec:
       labels:
         app: car-keeper-api
     spec:
+      initContainers:
+      - name: wait-for-postgres
+        image: busybox
+        command: ['sh', '-c', 'until nc -z -v -w30 car-keeper-db 5432; do echo "Waiting for PostgreSQL..."; sleep 5; done; echo "PostgreSQL is up!"']
       containers:
       - name: car-keeper-api
         image: nomanali1114/car_keeper_backend:latest
@@ -32,10 +36,6 @@ spec:
           value: "8080"
         ports:
         - containerPort: 8080
-        dependsOn:
-        - name: car-keeper-db
-          condition: service_healthy
-        restartPolicy: Always
 ---
 apiVersion: v1
 kind: Service
