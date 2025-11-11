@@ -30,3 +30,17 @@ Open your web browser and navigate to http://localhost:9090
 
 # To Access the Grafana UI
 Open your web browser and navigate to http://localhost:3000 (default username and password are both "admin")
+
+
+# To Run the Container of Car-Keeper-AutoZone-Hub Directly
+
+## First Create a Docker Network
+docker network create car-network
+
+## Then Run the PostgreSQL Container
+docker run --name my-postgres --network car-network -e POSTGRES_USER=caruser -e POSTGRES_PASSWORD=carpassword -e POSTGRES_DB=car -p 5432:5432 -d postgres:latest
+
+Wait form a few seconds to ensure PostgreSQL is up and running.
+
+## Finally, Run the Car-Keeper-AutoZone-Hub Container
+docker run --name golang-app -p 8080:8080 --network car-network -e DB_HOST=my-postgres -e DB_PORT=5432 -e DB_NAME=car -e DB_USER=caruser -e DB_PASSWORD=carpassword nomanali1114/car_keeper_backend:latest
