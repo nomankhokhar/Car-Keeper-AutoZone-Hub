@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: car-keeper-db
+  labels:
+    app: car-keeper-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: car-keeper-db
+  template:
+    metadata:
+      labels:
+        app: car-keeper-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:latest
+        env:
+        - name: POSTGRES_USER
+          value: caruser
+        - name: POSTGRES_PASSWORD
+          value: carpassword
+        - name: POSTGRES_DB
+          value: car
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - caruser
+            - -d
+            - car
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: postgres-data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: car-keeper-db
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: car-keeper-db

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: car-keeper-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: car-keeper-api
+  template:
+    metadata:
+      labels:
+        app: car-keeper-api
+    spec:
+      containers:
+      - name: car-keeper-api
+        image: nomanali1114/car_keeper_backend:latest
+        env:
+        - name: DB_HOST
+          value: car-keeper-db
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USER
+          value: caruser
+        - name: DB_PASSWORD
+          value: carpassword
+        - name: DB_NAME
+          value: car
+        - name: JWT_SECRET
+          value: BetterCallSoul
+        - name: PORT
+          value: "8080"
+        ports:
+        - containerPort: 8080
+        dependsOn:
+        - name: car-keeper-db
+          condition: service_healthy
+        restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: car-keeper-api
+spec:
+  selector:
+    app: car-keeper-api
+  ports:
+  - port: 8080
+    targetPort: 8080
