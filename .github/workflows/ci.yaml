@@ -22,5 +22,5 @@ jobs:
       - name: Build and push backend Docker image
         working-directory: ./Car_Keeper_backend/docker
         run: |
-          docker build -t nomanali1114/Car_Keeper_backend:latest .
-          docker push nomanali1114/Car_Keeper_backend:latest
+          docker build -t nomanali1114/car_keeper_backend:latest .
+          docker push nomanali1114/car_keeper_backend:latest
