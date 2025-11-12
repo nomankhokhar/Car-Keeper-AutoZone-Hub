@@ -44,3 +44,7 @@ Wait form a few seconds to ensure PostgreSQL is up and running.
 
 ## Finally, Run the Car-Keeper-AutoZone-Hub Container
 docker run --name golang-app -p 8080:8080 --network car-network -e DB_HOST=my-postgres -e DB_PORT=5432 -e DB_NAME=car -e DB_USER=caruser -e DB_PASSWORD=carpassword nomanali1114/car_keeper_backend:latest
+
+
+## Port-forward the argocd
+kubectl port-forward svc/car-keeper-api 8080:8080 -n argocd
