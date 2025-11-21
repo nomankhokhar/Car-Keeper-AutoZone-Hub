@@ -42,3 +42,15 @@ spec:
       volumes:
       - name: postgres-data
         emptyDir: {}  # or specify your PersistentVolumeClaim if you're using a PVC
+
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: car-keeper-db
+spec:
+  selector:
+    app: car-keeper-db
+  ports:
+  - port: 5432
+    targetPort: 5432
