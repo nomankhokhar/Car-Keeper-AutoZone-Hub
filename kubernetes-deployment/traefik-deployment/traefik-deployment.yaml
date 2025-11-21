@@ -1,0 +1,40 @@
+# traefik-deployment.yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik-ingress-controller
+  namespace: traefik
+  labels:
+    app: traefik
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      containers:
+        - name: traefik
+          image: traefik:v3.0 # Use the latest Traefik v3 image
+          args:
+            - --log.level=INFO
+            # Enables the Kubernetes Ingress Controller Provider
+            - --providers.kubernetesingress
+            # Entrypoints for HTTP and HTTPS
+            - --entrypoints.web.address=:80
+            - --entrypoints.websecure.address=:443
+            # Enables the API and Dashboard (accessible via port 8080)
+            - --api.dashboard=true
+            - --api.insecure=true # WARNING: Do not use in production without proper auth!
+          ports:
+            - name: web
+              containerPort: 80
+            - name: websecure
+              containerPort: 443
+            - name: dashboard
+              containerPort: 8080
