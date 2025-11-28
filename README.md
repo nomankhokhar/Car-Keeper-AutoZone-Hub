@@ -119,13 +119,29 @@ docker run --name golang-app -p 8080:8080 --network car-network \
   nomanali1114/car_keeper_backend:latest
 ```
 
------
+---
 
-## 4\. Kubernetes Deployment
+## 4. Kubernetes Deployment
 
-Below are the access points for the application and observability tools when deployed to a Kubernetes cluster using Traefik as the Load Balancer.
+Navigate to the `kubernetes-deployment` directory to locate the manifest files required to deploy the application stack (App, Database, Monitoring) using Traefik as the Ingress Controller.
 
-**Note:** Replace `{EXTERNAL-IP}` with the actual LoadBalancer IP assigned by your cloud provider.
+### Directory Structure
+
+* **`traefik-deployment/`**
+    Contains the core Traefik Load Balancer Deployment and Service definitions.
+    * *Refer to the internal README.md within this folder for specific Traefik installation instructions.*
+* **`Apps-deployment/`**
+    Contains the standard Kubernetes manifests (Deployments and Services) for the application components: PostgreSQL, Car-Keeper-AutoZone-Hub, Jaeger, Prometheus, and Grafana.
+* **`App-routes/`**
+    Contains the Traefik `IngressRoute` custom resources that define how external traffic is routed to specific internal services, including port configurations.
+
+### Deployment & Verification
+
+Once you have applied the configurations using `kubectl apply -f`, the services will be exposed via the External IP assigned to the Traefik Load Balancer.
+
+**Access Points**
+
+Replace `{EXTERNAL-IP}` with the actual public IP address of your Load Balancer (e.g., `129.212.x.x`).
 
 | Component | Access URL |
 | :--- | :--- |
