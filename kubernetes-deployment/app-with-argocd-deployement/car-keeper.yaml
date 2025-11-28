@@ -7,9 +7,9 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/nomankhokhar/Car-Keeper-AutoZone-Hub.git   # ✔ your repo
-    targetRevision: main                                                  # ✔ branch name
-    path: deployment                                                      # ✔ folder containing k8s yaml
+    repoURL: https://github.com/nomankhokhar/Car-Keeper-AutoZone-Hub.git        # ✔ your repo
+    targetRevision: main                                                        # ✔ branch name
+    path: kubernetes-deployment/app-with-argocd-deployement                     # ✔ folder containing k8s yaml
 
   destination:
     server: https://kubernetes.default.svc
