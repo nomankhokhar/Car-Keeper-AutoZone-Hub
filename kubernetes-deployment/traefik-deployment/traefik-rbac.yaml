@@ -1,18 +1,8 @@
-# traefik-rbac.yaml
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: traefik-ingress-controller
-  namespace: traefik # Ensure this matches the namespace you create
-
----
-apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: traefik-ingress-controller
+  name: traefik-role
 rules:
-  # Rules for standard Kubernetes Ingress objects
   - apiGroups:
       - ""
     resources:
@@ -33,30 +23,48 @@ rules:
       - get
       - list
       - watch
-  # Rules for Traefik Custom Resource Definitions (CRD) like IngressRoute, Middleware
+  - apiGroups:
+      - extensions
+      - networking.k8s.io
+    resources:
+      - ingresses/status
+    verbs:
+      - update
   - apiGroups:
       - traefik.io
     resources:
       - middlewares
+      - middlewaretcps
       - ingressroutes
+      - traefiktlsoptions
       - ingressroutetcps
-      - ingressrouteudps
       - traefikservices
+      - ingressrouteudps
+      - tlsoptions
+      - tlsstores
+      - serverstransports
     verbs:
       - get
       - list
       - watch
 
 ---
-apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: traefik-ingress-controller
+  name: traefik-role-binding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: traefik-ingress-controller
+  name: traefik-role
 subjects:
   - kind: ServiceAccount
-    name: traefik-ingress-controller
+    name: traefik-account
     namespace: traefik
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: traefik-account
+  namespace: traefik

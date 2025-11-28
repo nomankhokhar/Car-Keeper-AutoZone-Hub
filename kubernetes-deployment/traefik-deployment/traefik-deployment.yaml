@@ -1,14 +1,32 @@
-# traefik-deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik
+  namespace: traefik
+spec:
+  ports:
+    - protocol: TCP
+      name: web
+      port: 80
+    - protocol: TCP
+      name: websecure
+      port: 443
+    - protocol: TCP
+      name: admin
+      port: 8080
+  selector:
+    app: traefik
+  type: LoadBalancer # Change to NodePort or ClusterIP if needed
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: traefik-ingress-controller
+  name: traefik
   namespace: traefik
   labels:
     app: traefik
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: traefik
@@ -17,24 +35,19 @@ spec:
       labels:
         app: traefik
     spec:
-      serviceAccountName: traefik-ingress-controller
+      serviceAccountName: traefik-account
       containers:
         - name: traefik
-          image: traefik:v3.0 # Use the latest Traefik v3 image
+          image: traefik:v3.1
           args:
-            - --log.level=INFO
-            # Enables the Kubernetes Ingress Controller Provider
-            - --providers.kubernetesingress
-            # Entrypoints for HTTP and HTTPS
-            - --entrypoints.web.address=:80
-            - --entrypoints.websecure.address=:443
-            # Enables the API and Dashboard (accessible via port 8080)
-            - --api.dashboard=true
-            - --api.insecure=true # WARNING: Do not use in production without proper auth!
+            - "--api.insecure=true" # Enable Dashboard (Don't use insecure in Prod)
+            - "--providers.kubernetescrd" # Enable CRD provider
+            - "--entrypoints.web.address=:80"
+            - "--entrypoints.websecure.address=:443"
           ports:
             - name: web
               containerPort: 80
             - name: websecure
               containerPort: 443
-            - name: dashboard
+            - name: admin
               containerPort: 8080
