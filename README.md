@@ -1,3 +1,5 @@
+![Project Screenshot](./image/demo_work.png)
+
 # Full Monitoring System for Car-Keeper-AutoZone-Hub
 
 **Monitoring Architecture**
