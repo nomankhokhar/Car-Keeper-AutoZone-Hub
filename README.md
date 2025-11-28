@@ -1,8 +1,11 @@
-Here is the professional version of your README. I have organized it into logical sections, formatted the code blocks for readability, and corrected minor typographical errors while retaining 100% of your original information.
+# Full Monitoring System for Car-Keeper-AutoZone-Hub
 
------
+**Monitoring Architecture**
+The application is monitored using a modern observability pipeline designed to provide real-time visibility into system behavior:
 
-# Car-Keeper-AutoZone-Hub
+* **Jaeger (Tracing):** Tracks requests as they flow through the system, allowing for quick identification of bottlenecks and failures.
+* **Prometheus (Metrics):** Scrapes and stores time-series data, such as API request counts, error rates, and resource usage.
+* **Grafana (Visualization):** Connects to Prometheus to display actionable data on customizable dashboards, making it easy to monitor system stability at a glance.
 
 This repository contains the backend service for the Car-Keeper AutoZone Hub. Below are the instructions for building, running, and deploying the application using Docker Compose, local development environments, manual Docker containers, and Kubernetes.
 
