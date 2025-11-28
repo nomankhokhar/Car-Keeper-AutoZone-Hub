@@ -6,7 +6,7 @@ metadata:
 spec:
   # This matches the new entryPoint name we defined in the previous file
   entryPoints:
-    - cap-keeper-api
+    - car-keeper-api
   routes:
     # This matches ANY request coming into that port (IP or Domain)
     - match: HostRegexp('.*') # Replace with your public IP or domain

@@ -14,11 +14,26 @@ spec:
     - protocol: TCP
       name: admin
       port: 8080
-    # --- NEW EXTERNAL PORT ---
+    # --- NEW EXTERNAL PORT FOR CAR KEEPER API ---
     - protocol: TCP
-      name: cap-keeper-api
+      name: car-keeper-api
       port: 8000
       targetPort: 8000
+    # --- NEW EXTERNAL PORT FOR CAR KEEPER API Jaeger ---
+    - protocol: TCP
+      name: jaeger
+      port: 16686
+      targetPort: 16686
+    # -- NEW EXTERNAL PORT FOR Grafana ---
+    - protocol: TCP
+      name: grafana
+      port: 3000
+      targetPort: 3000
+    # -- NEW Prometheus PORT ---
+    - protocol: TCP
+      name: prometheus
+      port: 9090
+      targetPort: 9090
   selector:
     app: traefik
   type: LoadBalancer
@@ -49,8 +64,14 @@ spec:
             - "--providers.kubernetescrd"
             - "--entrypoints.web.address=:80"
             - "--entrypoints.websecure.address=:443"
-            # --- NEW INTERNAL LISTENER ---
-            - "--entrypoints.cap-keeper-api.address=:8000"
+            # --- NEW INTERNAL CAR KEEPER API LISTENER ---
+            - "--entrypoints.car-keeper-api.address=:8000"
+            # --- NEW INTERNAL CAR KEEPER API JAEGER LISTENER ---
+            - "--entrypoints.jaeger.address=:16686"
+            # --- NEW INTERNAL GRAFANA LISTENER ---
+            - "--entrypoints.grafana.address=:3000"
+            # --- NEW INTERNAL PROMETHEUS LISTENER ---
+            - "--entrypoints.prometheus.address=:9090"
           ports:
             - name: web
               containerPort: 80
@@ -59,5 +80,14 @@ spec:
             - name: admin
               containerPort: 8080
             # --- NEW CONTAINER PORT ---
-            - name: cap-keeper-api
+            - name: car-keeper-api
               containerPort: 8000
+            # --- NEW CONTAINER PORT FOR JAEGER ---
+            - name: jaeger
+              containerPort: 16686
+            # --- NEW CONTAINER PORT FOR GRAFANA ---
+            - name: grafana
+              containerPort: 3000
+            # --- NEW CONTAINER PORT FOR PROMETHEUS ---
+            - name: prometheus
+              containerPort: 9090

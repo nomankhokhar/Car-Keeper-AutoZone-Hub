@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: prometheus-ingress-route-9090
+  namespace: default
+spec:
+  entryPoints:
+    - prometheus
+  routes:
+    # PathPrefix matches everything better than HostRegexp for IP-based access
+    - match: PathPrefix(`/`) 
+      kind: Rule
+      services:
+        - name: prometheus
+          port: 9090
