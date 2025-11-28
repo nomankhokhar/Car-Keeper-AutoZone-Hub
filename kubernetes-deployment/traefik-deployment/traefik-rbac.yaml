@@ -3,12 +3,14 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: traefik-role
 rules:
+  # Standard Kubernetes Resources
   - apiGroups:
       - ""
     resources:
       - services
       - endpoints
       - secrets
+      - nodes
     verbs:
       - get
       - list
@@ -30,6 +32,16 @@ rules:
       - ingresses/status
     verbs:
       - update
+  # CRITICAL MISSING PIECE 1: Discovery (EndpointSlices)
+  - apiGroups:
+      - discovery.k8s.io
+    resources:
+      - endpointslices
+    verbs:
+      - list
+      - watch
+      - get
+  # CRITICAL MISSING PIECE 2: Traefik Custom Resources
   - apiGroups:
       - traefik.io
     resources:
@@ -43,6 +55,7 @@ rules:
       - tlsoptions
       - tlsstores
       - serverstransports
+      - serverstransporttcps # <--- This was missing in your logs
     verbs:
       - get
       - list
@@ -60,11 +73,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: traefik-account
-    namespace: traefik
-
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: traefik-account
-  namespace: traefik
+    namespace: default  # <--- CRITICAL: Ensures it works for Traefik in 'default'

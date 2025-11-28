@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: car-keeper-route-8000
+  namespace: default
+spec:
+  entryPoints:
+    - cap-keeper-api
+  routes:
+    # PathPrefix matches everything better than HostRegexp for IP-based access
+    - match: PathPrefix(`/`) 
+      kind: Rule
+      services:
+        - name: car-keeper-api
+          port: 8000

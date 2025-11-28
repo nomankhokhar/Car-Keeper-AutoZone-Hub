@@ -1,0 +1,16 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: car-keeper-route-8000
+  namespace: default
+spec:
+  # This matches the new entryPoint name we defined in the previous file
+  entryPoints:
+    - cap-keeper-api
+  routes:
+    # This matches ANY request coming into that port (IP or Domain)
+    - match: HostRegexp('.*') # Replace with your public IP or domain
+      kind: Rule
+      services:
+        - name: car-keeper-api
+          port: 8000

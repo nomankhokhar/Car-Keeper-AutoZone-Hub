@@ -14,9 +14,14 @@ spec:
     - protocol: TCP
       name: admin
       port: 8080
+    # --- NEW EXTERNAL PORT ---
+    - protocol: TCP
+      name: cap-keeper-api
+      port: 8000
+      targetPort: 8000
   selector:
     app: traefik
-  type: LoadBalancer # Change to NodePort or ClusterIP if needed
+  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -40,10 +45,12 @@ spec:
         - name: traefik
           image: traefik:v3.1
           args:
-            - "--api.insecure=true" # Enable Dashboard (Don't use insecure in Prod)
-            - "--providers.kubernetescrd" # Enable CRD provider
+            - "--api.insecure=true"
+            - "--providers.kubernetescrd"
             - "--entrypoints.web.address=:80"
             - "--entrypoints.websecure.address=:443"
+            # --- NEW INTERNAL LISTENER ---
+            - "--entrypoints.cap-keeper-api.address=:8000"
           ports:
             - name: web
               containerPort: 80
@@ -51,3 +58,6 @@ spec:
               containerPort: 443
             - name: admin
               containerPort: 8080
+            # --- NEW CONTAINER PORT ---
+            - name: cap-keeper-api
+              containerPort: 8000

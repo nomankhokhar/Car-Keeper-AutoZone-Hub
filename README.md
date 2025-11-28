@@ -47,7 +47,7 @@ docker run --name golang-app -p 8080:8080 --network car-network -e DB_HOST=my-po
 
 
 ## Port-forward the argocd
-kubectl port-forward svc/car-keeper-api 8080:8080
+kubectl port-forward svc/car-keeper-api 8000:8000
 
 ## Port-forward the argocd-server
 $ kubectl port-forward svc/argocd-server -n argocd 8080:443
