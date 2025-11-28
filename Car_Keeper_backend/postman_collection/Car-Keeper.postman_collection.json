@@ -1,0 +1,200 @@
+{
+	"info": {
+		"_postman_id": "89d7cff4-cb95-492b-b237-2725881c473f",
+		"name": "Car-Keeper",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23788349"
+	},
+	"item": [
+		{
+			"name": "Car_Api",
+			"item": [
+				{
+					"name": "Get Car By ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token-res}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{baseUrl}}/api/v1/cars/c7c1a6d5-1ec4-4c64-a59a-8a2f6f3d2bf3"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Car By Brand",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/cars?brand=chumu",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"cars"
+							],
+							"query": [
+								{
+									"key": "brand",
+									"value": "chumu"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Car",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"444444\",\r\n    \"year\": \"4444\",\r\n    \"brand\": \"chumu\",\r\n    \"fuel_type\": \"petrol\",\r\n    \"engine_id\": \"e1f86b1a-0873-4c19-bae2-fc60329d0140\",\r\n    \"price\": 44\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/api/v1/cars"
+					},
+					"response": []
+				},
+				{
+					"name": "Update the Car",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"update\",\r\n    \"year\": \"2022\",\r\n    \"brand\": \"lolu\",\r\n    \"fuel_type\": \"petrol\",\r\n    \"engine_id\": \"cc2c2a7d-2e21-4f59-b7b8-bd9e5e4cf04c\",\r\n    \"price\": 333.50\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/api/v1/cars/c7d7fe59-26b3-4b40-8c35-5e020b694ecf"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a Car",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{baseUrl}}/api/v1/cars/c7c1a6d5-1ec4-4c64-a59a-8a2f6f3d2bf3"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Engine_Api",
+			"item": [
+				{
+					"name": "Get a Engine",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{baseUrl}}/api/v1/engines/e1f86b1a-0873-4c19-bae2-fc60329d0140"
+					},
+					"response": []
+				},
+				{
+					"name": "Create a Engine",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"displacement\": 5,\r\n    \"no_of_cylinders\": 5,\r\n    \"car_range\": 5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/api/v1/engines"
+					},
+					"response": []
+				},
+				{
+					"name": "Update the Engine",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"displacement\": 4,\r\n    \"no_of_cylinders\": 4,\r\n    \"car_range\": 4\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/api/v1/engines/f522a78b-bcd0-433e-a2c6-379ae7e6b36b"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Engine ID",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{baseUrl}}/api/v1/engines/f522a78b-bcd0-433e-a2c6-379ae7e6b36b"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ping and Health Check",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{token-res}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						}
+					]
+				},
+				"url": "{{baseUrl}}/health"
+			},
+			"response": []
+		}
+	]
+}

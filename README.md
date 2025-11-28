@@ -9,6 +9,9 @@ The application is monitored using a modern observability pipeline designed to p
 
 This repository contains the backend service for the Car-Keeper AutoZone Hub. Below are the instructions for building, running, and deploying the application using Docker Compose, local development environments, manual Docker containers, and Kubernetes.
 
+## Postman Collection
+postman_collection.json contains the Postman collection for testing the API endpoints.
+
 ## 1\. Quick Start (Docker Compose)
 
 The easiest way to build and run the application along with all dependencies (PostgreSQL, Jaeger, Prometheus, Grafana) is via Docker Compose.
